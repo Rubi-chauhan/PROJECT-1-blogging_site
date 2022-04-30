@@ -27,14 +27,15 @@ const authentication = async function(req,res,next){
 
 const authorization = async function(req,res,next){
     try{
+        let authId =req.param.authorId
         let id =req.authorId
-        let token  = (req.headers["x-api-key"])
-        let decodedToken = jwt.verify(token, "author-blog")
+        // let token  = (req.headers["x-api-key"])
+        // let decodedToken = jwt.verify(token, "author-blog")
 
         if(!id)
         res.status(401).send({status: false, msg: "authorId must be present"});
 
-        if(id==decodedToken.authorId){
+        if(id !=authId){
             next()
         }else{
             res.status(401).send({status: false, msg: "author logged in is not allowed to modify or access the author data"});

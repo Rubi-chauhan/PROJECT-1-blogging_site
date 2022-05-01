@@ -6,7 +6,7 @@ const mid= require('../middleware/midfile')
 
 
 router.post('/createAuthor', AuthorController.createAuthor)
-router.post('/createBlog', BlogController.createBlog)
+router.post('/createBlog',mid.authentication, BlogController.createBlog)
 router.get('/getblog', mid.authentication, BlogController.getblog)
 router.put('/updateblog/:blogId',mid.authentication, mid.authorization, BlogController.updateblog)
 router.delete('/deleteById/:blogId',mid.authentication, mid.authorization, BlogController.deleteById)

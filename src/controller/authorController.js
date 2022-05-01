@@ -1,6 +1,6 @@
 
 const isemail = require('isemail');
-const validator =require("validator")
+// const validator =require("validator")
 const authorModel = require('../models/authorModel');
 const jwt = require("jsonwebtoken");
 
@@ -14,6 +14,10 @@ const isValid = function(value)
     }
     return true
 
+} 
+
+const isValidTitle = function(title){
+    return ["Mr", "Mrs","Miss"].includes(title)
 }
 
 const isValidUserInput = function(data){
@@ -37,13 +41,19 @@ const createAuthor = async function(req,res){
     return res.status(400).send({status:false, msg : "Last name is required"})
 
     if(!isValid(title))
+
     return res.status(400).send({status:false, msg:"Title is required"})
+
+    if (!isValidTitle(data.title)) {
+        return res.status(400).send({ status: false, message: "Valid title required" })
+    }
 
     if(!isValid(email))
     return res.status(400).send({status:false, msg:"E-mail is required"})
 
-    // if(!(validator.isemail(email)))
-    // return res.status(400).send({status:false, msg:"Please enter valid E-mail address"})
+    
+    if(data.email==authorModel.email)
+    return res.status(401).send({status:false, msg:"This e-mail address is already exist , Please enter valid E-mail address"})
 
 
     if(!isValid(password))

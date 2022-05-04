@@ -134,90 +134,30 @@ const getblog = async function (req, res) {
 }
 
 const updateblog = async function (req, res) {
-    try {
-        // 
-        let data = req.body;
+    try{  
+        let data =  req.body; 
         let blogId = req.params.blogId;
-        let authId = req.authorId
- 
-        if(isValidObjectId(blogId)){
-            return res.status(400).send({ status: false, msg: `${blogId} is not valid blog Id` });
+  
+        let blog = await blogModel.findById(blogId)
+        
+        if(!blog){
+        return res.status(404).send("No such blog exists");
         }
-
-        if(isValidObjectId(authId)){
-            return res.status(400).send({ status: false, msg: `${authId} is not valid author Id` });
+  
+        if(blog.isDeleted){
+        return res.status(400).send({ status: false, msg: "Blog not found, may be it is deleted" })
         }
-
-        let blog = await blogModel.findOne({ _id: blogId , isDeleted: false  })
-
-        if (!blog) {
-            return res.status(404).send({ status: false, msg: "No such blog exists" });
-        }
-
-        if(blog.authorId.toString() !== authId){
-            return res.status(401).send({ status: false, msg: "Unauthorized access , owner information doesn't match" });
-        }
-
-        if (!isValidUserInput(data)) {
-            return res.status(400).send({ status: false, msg: "No parameters passed. Please provide blog details for modification" })
-        }
-
-        const {title, body, tags, category, subcategory, isPublished} = data
-
-        const updatedBlogData = {}
-
-        if(isValid(title)){
-            if(!Object.prototype.hasOwnProperty.call(updatedBlogData, '$set')) updatedBlogData['$set'] ={}
-            updatedBlogData['$set'] ['title'] =title
-        }
-
-        if(isValid(body)){
-            if(!Object.prototype.hasOwnProperty.call(updatedBlogData, '$set')) updatedBlogData['$set'] ={}
-            updatedBlogData['$set'] ['body'] = body
-        }
-
-        if(isValid(category)){
-            if(!Object.prototype.hasOwnProperty.call(updatedBlogData, '$set')) updatedBlogData['$set'] ={}
-            updatedBlogData['$set'] ['category'] = category
-        }
-
-        if(isPublished !== undefined){
-            if(!Object.prototype.hasOwnProperty.call(updatedBlogData, '$set')) updatedBlogData['$set'] ={}
-            updatedBlogData['$set'] ['isPublished'] = isPublished
-            updatedBlogData['$set'] ['isPublished'] = isPublished ? new Date() : null
-        }
-
-        if(tags){
-            if(!Object.prototype.hasOwnProperty.call(updatedBlogData, '$addToSet')) updatedBlogData['$addToSet'] ={}
-            if(Array.isArray(tags)){
-            updatedBlogData['$addToSet'] ['tags'] = {$each:[...tags]}
-            }
-            if(typeof tags === "String"){
-                updatedBlogData['$addToSet'] ['tags'] = tags
-            }
-
-        }
-
-        if(subcategory){
-            if(!Object.prototype.hasOwnProperty.call(updatedBlogData, '$addToSet')) updatedBlogData['$addToSet'] ={}
-            if(Array.isArray(subcategory)){
-            updatedBlogData['$addToSet'] ['subcategory'] = {$each:[...subcategory]}
-            }
-            if(typeof subcategory === "String"){
-                updatedBlogData['$addToSet'] ['subcategory'] = subcategory
-            }
-
-        }
-
-
-        let updatedblog = await blogModel.findOneAndUpdate({ _id: blogId }, updatedBlogData, { new: true });
-
-        res.status(201).send({ status: true, data: updatedblog, msg: "Blog successfully updated" });
+  
+  
+        let updatedblog = await blogModel.findByIdAndUpdate({ _id: blogId },{...data},{new:true});
+  
+        res.status(201).send({ msg: "Successfully updated", data: updatedblog });
     }
-    catch (err) {
+    catch (err){
         res.status(500).send({ msg: "Error", error: err.message })
     }
-}
+  }
+
 
 
 

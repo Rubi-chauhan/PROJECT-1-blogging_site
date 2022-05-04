@@ -5,17 +5,15 @@ const BlogController = require('../controller/blogController')
 const mid= require('../middleware/midfile')
 
 
-router.post('/createAuthor', AuthorController.createAuthor)
-router.post('/createBlog',mid.authentication, BlogController.createBlog)
-router.get('/getblog', mid.authentication, BlogController.getblog)
-router.put('/updateblog/:blogId',mid.authentication, mid.authorization, BlogController.updateblog)
-router.delete('/deleteById/:blogId',mid.authentication, mid.authorization, BlogController.deleteById)
-router.delete('/deleteBlogByParam',mid.authentication, mid.authorization, BlogController.deleteBlogByquery)
-router.post('/loginAuthor', AuthorController.loginAuthor)
+router.post('/author', AuthorController.createAuthor)
+router.post('/blog',mid.authentication, BlogController.createBlog)
+router.get('/blogs', mid.authentication, BlogController.getblog)
+router.put('/blogs/:blogId',mid.authentication, mid.authorization, BlogController.updateblog)
+router.delete('/blogs/:blogId',mid.authentication, mid.authorization, BlogController.deleteById)
+router.delete('/blogs',mid.authentication, mid.authorization, BlogController.deleteBlogByquery)
+router.post('/login', AuthorController.loginAuthor)
 
 
-
-// router.get('/filterblog', BlogController.filterblog)
 
 
 

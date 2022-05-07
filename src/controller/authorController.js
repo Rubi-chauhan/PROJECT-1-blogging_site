@@ -24,8 +24,10 @@ const isValidTitle = function(title){
 //     return ["Mr", "Mrs","Miss"].includes(title)
 // }
 
-const isValidUserInput = function(data){
-    return Object.keys(data).length>0
+const emailRegex =  /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+
+const isValidRequestBody = function(request){
+    return Object.keys(request).length>0
 }
 
 const createAuthor = async function(req,res){
@@ -35,7 +37,7 @@ const createAuthor = async function(req,res){
     let {fname, lname, title, email, password}= data  //object destructinng
 // ---------------------------------------------* validations starts *---------------------------------------------//
     
-    if(!isValidUserInput(data)){
+    if(!isValidRequestBody(data)){
         return res.status(400).send({status:false, msg : "Invalid request parameters. Please provide author details"})
     }
 
@@ -60,21 +62,16 @@ const createAuthor = async function(req,res){
     if(data.email==authorModel.email)
     return res.status(401).send({status:false, msg:"This e-mail address is already exist , Please enter valid E-mail address"})
 
-    if(!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))){
+    if(!(emailRegex.test(email))){
         return res.status(400).send({status:false, msg:"E-mail should be a valid e-mail address"})
     }
 
     if(!isValid(password))
     return res.status(400).send({status:false, msg:"password is not exist"})
 
-    const isEmailAlreadyUsed = await authorModel.findOne({email})
-    
-    if(isEmailAlreadyUsed){
-        return res.status(400).send({status:false, msg:"This e-mail address is already registred with us, please try different e-mail address"})
-    }
 
     let authorCreated = await authorModel.create(data)
-    return res.status(201).send({status:true, data : authorCreated, msg: "Author created successfully"})
+    return res.status(201).send({status:true,msg: "Author created successfully", data : authorCreated})
 }
 catch(err){
     return res.status(500).send({msg:"Error", error:err.message})
@@ -97,7 +94,7 @@ const loginAuthor = async function (req, res) {
     return res.status(400).send({status:false, msg:"E-mail is required"})
     }
 
-    if(!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))){
+    if(!(emailRegex.test(email))){
         return res.status(400).send({status:false, msg:"E-mail should be a valid e-mail address"})
     }
 
